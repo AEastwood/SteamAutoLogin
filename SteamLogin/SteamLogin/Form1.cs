@@ -34,7 +34,7 @@ namespace SteamLogin
                         Ip = "any",
                         Port = listenPort,
                         Security = "TLS",
-                        Certificate = new SuperSocket.SocketBase.Config.CertificateConfig
+                        Certificate = new CertificateConfig
                         {
                             FilePath = @"E:\SteamLogin\cert.pfx",
                             Password = "42^kFvZtkf2?8pGza^Lm4mp9aSpL8bEGgcf99qwG*e55rwV=_hJJ$5CjS6f*3hSK"
