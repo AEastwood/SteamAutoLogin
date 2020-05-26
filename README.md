@@ -2,7 +2,7 @@
 
 SteamAutoLogon is a web based tool to quickly change steam accounts.
 
-Database: SQL
+Database Structure
 
 ```bash
 int(11): Id
