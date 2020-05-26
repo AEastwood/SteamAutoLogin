@@ -8,12 +8,22 @@ function login(Username) {
 }
 
 function CreateLoginRequest(Username) {
-    var xhttp = new XMLHttpRequest();
-    xhttp.onreadystatechange = function() {
-        if (this.readyState == 4 && this.status == 200) {
-            swal("Login Sent", `You've logged in as ${Username}`, "success");
+    let loginUri = `/docommand.php?command=login&username=${Username}`;
+    var showFailure = true;
+
+    $.ajax({
+        url: loginUri,
+        type: 'GET',
+        success: function(res) {
+            var webSocket = new WebSocket(`wss://localhost:2326`);
+                webSocket.onopen = function (event) {
+                webSocket.send(res);
+                webSocket.onclose = function (event) {
+                    swal("Login Sent", `You've logged in as ${Username}`, "success");
+                }
+            };
+            
         }
-    };
-    xhttp.open("GET", `http://192.168.1.75/loginv2/docommand.php?command=login&username=${Username}`, true);
-    xhttp.send();
+    }); 
+    
 }

@@ -1,10 +1,6 @@
 <?php
-$Username = "root";
-$Password = "";
-$Database = "steam";
-
-$PDO = new PDO("mysql:host=localhost;dbname=$Database", $Username, $Password);
-$Query = $PDO->query('SELECT user FROM accounts WHERE enabled = 1 ORDER BY user ASC');
+require_once('config.php');
+Config::SafetyCheck();
 ?>
 
 <!DOCTYPE html>
@@ -14,6 +10,7 @@ $Query = $PDO->query('SELECT user FROM accounts WHERE enabled = 1 ORDER BY user 
     <meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" type="text/css" href="css/main.css">
+    <?php echo "<script>var IP = $IPAddress;</script>" ?>
 </head>
 <body>
 
@@ -43,8 +40,9 @@ $Query = $PDO->query('SELECT user FROM accounts WHERE enabled = 1 ORDER BY user 
 </table>
 
     <div class="footer">AdamEastwood &copy; 2019</div>
+    <script src="https://code.jquery.com/jquery-3.5.1.js" integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc=" crossorigin="anonymous"></script>
     <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
-    <script src="js/main.js"></script>
+    <script src="js/main.js?<?php echo rand(0, getrandmax()) ?>"></script>
 
 </body>
 </html>

@@ -1,17 +1,15 @@
 <?php
 
 $validCommands = ["delete", "login"];
-$Command = isset($_GET['command']) ? $_GET['command'] : "nothing"; 
+$Command = isset($_GET['command']) ? $_GET['command'] : null; 
 
-if(!in_array($_GET['command'], $validCommands)){
-    header("Location: ./index.php");
+if(!in_array($_GET['command'], $validCommands) || $Command == null){
+    return;
 }
 
-if(isset($_GET['command'])){
-    $Account = (object)[];
-    $Account->Username = isset($_GET['username']) ? $_GET['username'] : "";
-    Commands::RunCommand($Command, $Account);  
-}
+$Account = (object)[];
+$Account->Username = isset($_GET['username']) ? $_GET['username'] : null;
+Commands::RunCommand($Command, $Account);  
 
 class Commands {
 
@@ -19,28 +17,17 @@ class Commands {
         switch($Command) {
             
             case "login":
-                if(!file_exists("login.txt")){
-                    fopen("login.txt", "w");
-                }
-
-                $Account->Password = Commands::GetPassword($Account->Username);
-                file_put_contents(__DIR__ . "/login.txt", json_encode($Account));
-                break;
-
-            case "delete":
-                if(file_exists("login.txt")){
-                    unlink("login.txt");
-                }
-
+                $Account->Password = self::GetPassword($Account->Username);
+                $Account->data = base64_encode(json_encode($Account));
+                echo $Account->data;
                 break;
         }
     }
 
     public function GetPassword(string $Account): string{
-        $Username = "root";
+        $Username = "pmauser";
         $Password = "";
         $Database = "steam";
-        $RPassword = "steam";
 
         $PDO = new PDO("mysql:host=localhost;dbname=$Database", $Username, $Password);
         $Query = $PDO->prepare('SELECT pass FROM accounts WHERE user=:user');

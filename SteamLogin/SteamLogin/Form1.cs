@@ -6,48 +6,83 @@ using System.Text;
 using System.Threading;
 using System.Windows.Forms;
 using Newtonsoft.Json;
+using SuperSocket.SocketBase.Config;
+using SuperWebSocket;
 
 namespace SteamLogin
 {
     public partial class Form1 : Form
     {
-        private string defaultLogin = "http://192.168.1.75/loginv2/login.txt";
-        private string steamInstallPath = @"C:\Program Files (x86)\Steam\steam.exe";
-        private Thread command;
+        private readonly string steamInstallPath = @"C:\Program Files (x86)\Steam\steam.exe";
+        private readonly int listenPort = 2326;
         public Form1()
         {
             InitializeComponent();
         }
 
+        private readonly int mode = 1;
         private void Form1_Load(object sender, EventArgs e)
         {
-            command = new Thread(getCommands);
-            command.Start();
-        }
-
-        private void getCommands()
-        {
-            while (true)
+            switch (mode)
             {
-                Thread.Sleep(1000);
-                SendCommand(defaultLogin);
+                // Await Connection
+                case 1:
+
+                    var serverConfig = new ServerConfig()
+                    {
+                        Name = "server",
+                        Ip = "any",
+                        Port = listenPort,
+                        Security = "TLS",
+                        Certificate = new SuperSocket.SocketBase.Config.CertificateConfig
+                        {
+                            FilePath = @"E:\SteamLogin\cert.pfx",
+                            Password = "42^kFvZtkf2?8pGza^Lm4mp9aSpL8bEGgcf99qwG*e55rwV=_hJJ$5CjS6f*3hSK"
+                        },
+                    };
+                    
+                    WebSocketServer listener = new WebSocketServer();
+                    listener.Setup(new RootConfig(), serverConfig);
+                    listener.NewMessageReceived += listener_NewMessageReceived;
+                    listener.Start();
+                    return;
             }
         }
 
-        private string passwordDecoded;
-        private void PerformLogin(string loginDetails)
+        private void listener_NewMessageReceived(WebSocketSession session, string value)
         {
-            dynamic accountDetails = JsonConvert.DeserializeObject(loginDetails);
-            byte[] passwordData = Convert.FromBase64String(accountDetails.Password.ToString());
-            passwordDecoded = Encoding.UTF8.GetString(passwordData);
-            
-            RunProcess("taskkill.exe", "/im steam.exe -f");
-            RunProcess(steamInstallPath, $"-login {accountDetails.Username} {passwordDecoded}");
-            SendCommand("http://192.168.1.75/loginv2/docommand.php?command=delete");
-            
-            passwordDecoded = null;
+            PerformLogin(value);
         }
 
+        private string base64Decode(string baseString)
+        {
+            byte[] userDetails = Convert.FromBase64String(baseString);
+            string returnString = ASCIIEncoding.ASCII.GetString(userDetails);
+            return returnString;
+        }
+
+        /*
+         * void 'PerformLogin' parses 'passwordDecoded' and passes it as argument to 'steamInstallPath' EXE
+         */
+        private void PerformLogin(string loginDetails)
+        {
+            dynamic accountDetails;
+            try
+            {
+                accountDetails = JsonConvert.DeserializeObject(base64Decode(loginDetails));
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.ToString());
+                return;
+            }
+
+            RunProcess("taskkill.exe", "/im steam.exe -f");
+            Thread.Sleep(100);
+            RunProcess(steamInstallPath, $"-login {accountDetails.Username} {base64Decode(accountDetails.Password.Value)}");
+        }
+
+        // starts process with arguments
         private void RunProcess(string process, string args)
         {
             ProcessStartInfo CMD = new ProcessStartInfo(process)
@@ -60,28 +95,9 @@ namespace SteamLogin
             Thread.Sleep(500);
         }
 
-        private void SendCommand(string url)
-        {
-            try
-            {
-                string loginDetails;
-                HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
-                request.AutomaticDecompression = DecompressionMethods.GZip;
-
-                using (HttpWebResponse response = (HttpWebResponse)request.GetResponse())
-                using (Stream stream = response.GetResponseStream())
-                using (StreamReader reader = new StreamReader(stream))
-                    loginDetails = reader.ReadToEnd();
-
-                if (!string.IsNullOrEmpty(loginDetails))
-                    PerformLogin(loginDetails);
-            }
-            catch (WebException) { }
-        }
-
+        // All the below just simply closes the application
         private void QuitApplication()
         {
-            command.Abort();
             Application.Exit();
         }
 
