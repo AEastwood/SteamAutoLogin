@@ -1,6 +1,6 @@
 # SteamAutoLogon
 
-SteamAutoLogon is a web based tool to quickly change steam accounts;
+SteamAutoLogon is a web based tool to quickly change steam accounts.
 
 Database: SQL
 
