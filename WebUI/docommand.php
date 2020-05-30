@@ -1,6 +1,9 @@
 <?php
+require('config.php');
+session_start();
+Config::SafetyCheck();
 
-$validCommands = ["delete", "login"];
+$validCommands = ["login"];
 $Command = isset($_GET['command']) ? $_GET['command'] : null; 
 
 if(!in_array($_GET['command'], $validCommands) || $Command == null){
