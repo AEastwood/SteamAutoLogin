@@ -10,13 +10,16 @@ function login(Username, endpoint) {
 }
 
 function CreateLoginRequest(Username, endpoint) {
-    let loginUri = `/docommand.php?command=login&username=${Username}`;
 
+    
+    let loginUri = `/steam/?uname=${Username}`;
+    
+    
     $.ajax({
         url: loginUri,
         type: 'GET',
         success: function(res) {
-            var webSocket = new WebSocket(`wss://${endpoint}:2326`);
+            var webSocket = new WebSocket(`ws://${endpoint}:2326`);
                 webSocket.onopen = function (event) {
                 webSocket.send(res);
                 swal("Login Sent", `You've logged in as ${Username}`, "success");

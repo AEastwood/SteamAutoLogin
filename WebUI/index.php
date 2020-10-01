@@ -1,9 +1,14 @@
 <?php
 require_once('config.php');
-session_start();
-Config::SafetyCheck();
-$pin = $_SESSION['pin'];
-$endpoint = '';
+
+$auth->requireAuthentication();
+$auth->isAuthenticated();
+
+if( $auth->isAjax() && $auth->isAuthenticated() )
+{
+    $accountName = $_GET['uname'];
+    die( json_encode($accounts->getAccountDetails($accountName)) );
+}
 ?>
 
 <!DOCTYPE html>
@@ -13,11 +18,13 @@ $endpoint = '';
     <meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" type="text/css" href="css/main.css">
-    <?php echo "<script>var pin = $pin</script>" ?>
+    <script src="https://code.jquery.com/jquery-3.5.1.js" integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc=" crossorigin="anonymous"></script>
+    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+    <script src="js/main.js?<?php echo rand(0, getrandmax()) ?>"></script>
 </head>
 <body>
 
-<h1><span class="blue">&lt;/</span><span class="red">SteamLogin()->ListAccounts('<?php echo ucfirst($_SESSION['username']); ?>');</span><span class="blue">&gt;</span></h1>
+<h1><span class="blue">&lt;/</span><span class="red">SteamLogin</span><span class="blue">&gt;</span></h1>
 
 <table class="container">
 	<thead>
@@ -29,12 +36,11 @@ $endpoint = '';
 	<tbody>
 		<tr>
         <?PHP
-            while($Account = $Query->fetch(PDO::FETCH_ASSOC))
+            foreach($accounts->listAll() as $account)
             {
-                $User = $Account['user'];
                 echo "<tr>";
-                echo "<td>$User</td>";
-                echo "<td onclick=\"login('$User');\">Login</td>";
+                echo "<td>" . $account['user'] . "</td>";
+                echo "<td onclick=\"login('" . $account['user'] . "');\">Login</td>";
                 echo "</tr>\n";
             }
         ?>
@@ -42,10 +48,6 @@ $endpoint = '';
 	</tbody>
 </table>
 
-    <div class="footer"> AdamEastwood &copy; <?PHP echo date("Y"); ?> -> <a href="login.php?logout" style="color:#a7a1ae;text-decoration:none;">Logout</a></div>
-    <script src="https://code.jquery.com/jquery-3.5.1.js" integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc=" crossorigin="anonymous"></script>
-    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
-    <script src="js/main.js?<?php echo rand(0, getrandmax()) ?>"></script>
-
+    <div class="footer"> AdamEastwood -> <a href="logout.php" style="color:#a7a1ae;text-decoration:none;">Logout</a></div>
 </body>
 </html>

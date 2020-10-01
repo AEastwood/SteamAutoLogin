@@ -1,21 +1,15 @@
 <?php
-require 'config.php';
-session_start();
+
+require_once 'config.php';
 
 if(isset($_GET['logout'])){
 	session_destroy();
 }
 
-if(isset($_SESSION['valid']) && $_SESSION['valid'] == true){
-	header('Location: index.php');
-}
-
-if(isset($_POST['u']) && isset($_POST['p'])){
-    $details = new \stdClass();;
-    $details->username = strtolower($_POST['u']);
-    $details->password = $_POST['p'];
-
-    Config::Login($details);
+if( isset($_POST['u']) && isset($_POST['p']) ){
+	$username = strtolower($_POST['u']);
+	$password = $_POST['p'];
+	Core\Auth::Login($username, $password);
 }
 
 
