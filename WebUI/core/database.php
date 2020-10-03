@@ -16,7 +16,7 @@ class Database {
 
         self::$commands = array(
             'checkAccount' => self::$pdo->prepare('SELECT username, password, suspended FROM users WHERE username = :user AND suspended = 0 LIMIT 1'),
-            'listAccounts' => self::$pdo->query('SELECT user FROM accounts WHERE enabled = 1 ORDER BY user ASC'),
+            'listAccounts' => self::$pdo->query('SELECT user, steamid FROM accounts WHERE enabled = 1 ORDER BY user ASC'),
             'getPassword' => self::$pdo->prepare('SELECT pass FROM accounts WHERE user=:user LIMIT 1')
         );
     }

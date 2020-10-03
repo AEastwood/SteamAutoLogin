@@ -5,8 +5,9 @@ define('DB_USER', '');
 define('DB_PASS', '');
 define('DB_TABLE', '');
 define('DB_HOST', '');
+define('STEAM_KEY', '');
 
-$required = array( 'core/auth', 'core/database' );
+$required = array( 'core/auth', 'core/database', 'core/steamAPI' );
 
 foreach($required as $file) 
 {
@@ -14,4 +15,4 @@ foreach($required as $file)
 }
 
 $auth = new Core\Auth;
-$accounts = new Core\Database;
+$database = new Core\Database;
