@@ -4,35 +4,62 @@ namespace Core;
 
 class SteamAPI {
 
-    public static $account;
+    public static $accounts = array();
 
     /**
-     *  constructor function
+     *  adds account to array
      */
-    public function __construct($steamId)
+    public function addaccount($account)
     {
-        $apiLink = "http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key=" . STEAM_KEY . "&steamids=" . $steamId;
+        array_push(self::$accounts, $account);
+    }
+
+    /**
+     *  Generates table rows for UI
+     */
+    public function generateTableRows()
+    {
+        foreach(self::$accounts as $account)
+        {
+                echo "<tr>";
+                echo "<td class='table_display'><img src='" . $account['avatarmedium'] . "'></td>";
+                echo "<td class='table_persona'>" .$account['personaname'] . "</td>";
+                echo "<td class='table_profile' onclick=\"window.open('" .$account['profileurl'] . "');\">" . $account['profileurl'] . "</td>";
+                echo "<td onclick=\"login('" . $account['user'] . "');\">Login</td>";
+                echo "</tr>\n";
+        }
+    }
+
+    /**
+     *  runs all queries as one request making it load faster
+     */
+    public function makeRequest()
+    {
+        $steamIDs = array();
+
+        foreach(self::$accounts as $account) 
+        {
+            array_push($steamIDs, $account['steamID64']);
+        }
+
+        $apiLink = "http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key=" . STEAM_KEY . "&steamids=" . implode(',', $steamIDs);
         $apiData = file_get_contents($apiLink);
         $apiData = json_decode($apiData);
-        
-        foreach($apiData->response->players[0] as $k => $v)
+
+        foreach($apiData->response->players as $player)
         {
-            self::$account[$k] = $v;
+            for($i = 0; $i < count(self::$accounts); $i++)
+            {
+                if(self::$accounts[$i]['steamID64'] === $player->steamid)
+                {
+                    self::$accounts[$i]['steamid'] = $account['steamID64'];
+                    self::$accounts[$i]['username'] = $account['user'];
+                    self::$accounts[$i]['avatarmedium'] = $player->avatarmedium;
+                    self::$accounts[$i]['personaname'] = $player->personaname;
+                    self::$accounts[$i]['profileurl'] = $player->profileurl;
+                }
+            }
         }
     }
-
-    /**
-     *  get data from the api request
-     */
-    public static function getData($key)
-    {
-        if(isset(self::$account[$k]))
-        {
-            return self::$account[$k];
-        }
-
-        return "undefined";
-    }
-
 
 }

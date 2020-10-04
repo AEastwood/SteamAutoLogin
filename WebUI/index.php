@@ -1,6 +1,8 @@
 <?php
 require_once('config.php');
 
+use Core\SteamAPI;
+
 $auth->requireAuthentication();
 $auth->isAuthenticated();
 
@@ -9,6 +11,13 @@ if( $auth->isAjax() && $auth->isAuthenticated() )
     $accountName = $_GET['uname'];
     die( json_encode($database->getAccountDetails($accountName)) );
 }
+
+foreach($database->listAll() as $account)
+{
+    SteamAPI::addAccount([ 'user' => $account['user'], 'steamID64' => $account['steamid'] ]);
+}
+
+SteamAPI::makeRequest();
 ?>
 
 <!DOCTYPE html>
@@ -37,18 +46,7 @@ if( $auth->isAjax() && $auth->isAuthenticated() )
 	</thead>
 	<tbody>
 		<tr>
-        <?PHP
-            foreach($database->listAll() as $account)
-            {
-                $steamData = new Core\SteamAPI($account['steamid']);
-                echo "<tr>";
-                echo "<td class='table_display'><img src='" . $steamData::$account['avatarmedium'] . "'></td>";
-                echo "<td class='table_persona'>" . $steamData::$account['personaname'] . "</td>";
-                echo "<td class='table_profile' onclick=\"window.open('" . $steamData::$account['profileurl'] . "');\">" .$steamData::$account['profileurl'] . "</td>";
-                echo "<td onclick=\"login('" . $account['user'] . "');\">Login</td>";
-                echo "</tr>\n";
-            }
-        ?>
+            <?php SteamAPI::generateTableRows(); ?>
 		</tr>
 	</tbody>
 </table>

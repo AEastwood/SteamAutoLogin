@@ -16,3 +16,4 @@ foreach($required as $file)
 
 $auth = new Core\Auth;
 $database = new Core\Database;
+$steamAPI = new Core\SteamAPI();
