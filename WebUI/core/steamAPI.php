@@ -52,8 +52,6 @@ class SteamAPI {
             {
                 if(self::$accounts[$i]['steamID64'] === $player->steamid)
                 {
-                    self::$accounts[$i]['steamid'] = $account['steamID64'];
-                    self::$accounts[$i]['username'] = $account['user'];
                     self::$accounts[$i]['avatarmedium'] = $player->avatarmedium;
                     self::$accounts[$i]['personaname'] = $player->personaname;
                     self::$accounts[$i]['profileurl'] = $player->profileurl;
