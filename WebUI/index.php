@@ -33,24 +33,19 @@ SteamAPI::makeRequest();
 </head>
 <body>
 
-<h1><span class="blue">&lt;/</span><span class="red">SteamLogin</span><span class="blue">&gt;</span></h1>
-
-<table class="container">
-	<thead>
-		<tr>
-			<th><h1>Avatar</h1></th>
-			<th><h1>Persona Name</h1></th>
-			<th><h1>Profile URL</h1></th>
-			<th><h1>Login</h1></th>
-		</tr>
-	</thead>
-	<tbody>
-		<tr>
-            <?php SteamAPI::generateTableRows(); ?>
-		</tr>
-	</tbody>
-</table>
-
-    <div class="footer"> AdamEastwood -> <a href="logout.php" style="color:#a7a1ae;text-decoration:none;">Logout</a></div>
+	<h1>
+		<span class="blue">&lt;/</span><span class="red">SteamLogin</span><span class="blue">&gt;</span>
+	</h1>
+	<div class="accounts">
+		<?php SteamAPI::generateUserCards(); ?>
+	</div>
+		
+	<div class="footer"> 
+		AdamEastwood -> 
+		<a href="logout.php" style="color:#a7a1ae;text-decoration:none;font-size: 16px;">
+			Logout
+		</a>
+	</div>
+	
 </body>
 </html>

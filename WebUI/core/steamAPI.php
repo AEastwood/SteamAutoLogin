@@ -17,16 +17,18 @@ class SteamAPI {
     /**
      *  Generates table rows for UI
      */
-    public function generateTableRows()
+    public function generateUserCards()
     {
         foreach(self::$accounts as $account)
         {
-                echo "<tr>";
-                echo "<td class='table_display'><img src='" . $account['avatarmedium'] . "'></td>";
-                echo "<td class='table_persona'>" .$account['personaname'] . "</td>";
-                echo "<td class='table_profile' onclick=\"window.open('" .$account['profileurl'] . "');\">" . $account['profileurl'] . "</td>";
-                echo "<td onclick=\"login('" . $account['user'] . "');\">Login</td>";
-                echo "</tr>\n";
+            $userCard = "<div class=\"card\">";
+            $userCard .= "<img src=\"" . $account['avatarfull'] ."\" alt=\"" . $account['personaname'] . "\" style=\"width:250px\">";
+            $userCard .= "<b>" . $account['personaname'] . "</b>";
+            $userCard .= "<p class=\"title\" onclick=\"window.open('" .$account['profileurl'] . "');\">Profile</p>";
+            $userCard .= "<p><button onclick=\"login('" . $account['user'] . "');\">Login</button></p>";
+            $userCard .= "</div>";
+
+            echo $userCard;
         }
     }
 
@@ -52,7 +54,7 @@ class SteamAPI {
             {
                 if(self::$accounts[$i]['steamID64'] === $player->steamid)
                 {
-                    self::$accounts[$i]['avatarmedium'] = $player->avatarmedium;
+                    self::$accounts[$i]['avatarfull'] = $player->avatarfull;
                     self::$accounts[$i]['personaname'] = $player->personaname;
                     self::$accounts[$i]['profileurl'] = $player->profileurl;
                 }
