@@ -22,7 +22,7 @@ class Database {
         }
         catch(\PDOException $e) 
         {
-            HandleError::withMessage(500, $e->getMessage());
+            die( HandleError::withMessage(500, $e->getMessage()) );
         }
 
         self::$commands = array(
