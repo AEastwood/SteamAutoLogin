@@ -1,13 +1,13 @@
 <?php
 
-define('APP_ROOT', '');
+define('APP_ROOT', '/steam');
 define('DB_USER', '');
 define('DB_PASS', '');
 define('DB_TABLE', '');
 define('DB_HOST', '');
 define('STEAM_KEY', '');
 
-$required = array( 'core/auth', 'core/database', 'core/steamAPI' );
+$required = array( 'core/auth', 'core/database', 'core/handleError', 'core/steamAPI' );
 
 foreach($required as $file) 
 {

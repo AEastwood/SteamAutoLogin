@@ -2,6 +2,8 @@
 
 namespace Core;
 
+use Core\HandleError;
+
 class Database {
 
     public static $pdo;
@@ -12,12 +14,21 @@ class Database {
      */
     public function __construct()
     {
-        self::$pdo = new \PDO("mysql:host=" . DB_HOST . ";dbname=" . DB_TABLE, DB_USER, DB_PASS);
+        try 
+        {
+            self::$pdo = new \PDO("mysql:host=" . DB_HOST . ";dbname=" . DB_TABLE, DB_USER, DB_PASS);
+            self::$pdo->setAttribute(\PDO::ATTR_TIMEOUT, 1);
+            self::$pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
+        }
+        catch(\PDOException $e) 
+        {
+            die( HandleError::withMessage(500, $e->getMessage()) );
+        }
 
         self::$commands = array(
-            'checkAccount' => self::$pdo->prepare('SELECT username, password, suspended FROM users WHERE username = :user AND suspended = 0 LIMIT 1'),
+            'getPassword' => self::$pdo->prepare('SELECT pass FROM accounts WHERE user=:user LIMIT 1'),
             'listAccounts' => self::$pdo->query('SELECT user, steamid FROM accounts WHERE enabled = 1 ORDER BY user ASC'),
-            'getPassword' => self::$pdo->prepare('SELECT pass FROM accounts WHERE user=:user LIMIT 1')
+            'verifyLogin' => self::$pdo->prepare('SELECT username, password, suspended FROM users WHERE username = :user AND suspended = 0 LIMIT 1'),
         );
     }
 
@@ -75,7 +86,7 @@ class Database {
      */
     public function login($username, $password)
     {
-        $login = self::$commands['checkAccount'];
+        $login = self::$commands['verifyLogin'];
         $login->bindValue(':user', $username, \PDO::PARAM_STR);
         $login->execute();
 
