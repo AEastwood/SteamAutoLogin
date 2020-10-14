@@ -22,7 +22,7 @@ class Database {
         }
         catch(\PDOException $e) 
         {
-            die( HandleError::withMessage(500, $e->getMessage()) );
+            HandleError::withMessage(500, $e->getMessage());
         }
 
         self::$commands = array(
@@ -68,6 +68,14 @@ class Database {
         }
 
         return false;
+    }
+
+    /**
+     *  returns true if connected to database
+     */
+    public function isConnection()
+    {
+        
     }
 
     /**
