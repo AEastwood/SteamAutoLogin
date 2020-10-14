@@ -71,14 +71,6 @@ class Database {
     }
 
     /**
-     *  returns true if connected to database
-     */
-    public function isConnection()
-    {
-        
-    }
-
-    /**
      *  Command handler
      */
     public function listAll()
