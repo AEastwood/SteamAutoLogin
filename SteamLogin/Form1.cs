@@ -2,10 +2,8 @@
 using SuperSocket.SocketBase.Config;
 using SuperWebSocket;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
-using System.Text;
 using System.Threading;
 using System.Windows.Forms;
 
@@ -16,8 +14,21 @@ namespace SteamLogin
         private readonly string steamInstallPath = @"C:\Program Files (x86)\Steam\steam.exe";
         private readonly int listenPort = 2326;
         
-        readonly HWID hwid = new HWID();
-        readonly Cryptography crypt = new Cryptography();
+        // Property for handling monitor count, when set updates smart plugs
+        // this will only work for turning off the screens
+        private int monitorCount;
+        private int MonitorCount
+        {
+            get { return monitorCount; }
+            set
+            {
+                monitorCount = Screen.AllScreens.Length;
+                handleMonitorCount();
+            }
+        }
+
+        private readonly HWID hwid = new HWID();
+        private readonly Cryptography crypt = new Cryptography();
 
         private static string key = string.Empty;
 
@@ -38,7 +49,7 @@ namespace SteamLogin
             {
                 Ip = "any",
                 Port = listenPort,
-                
+
             };
 
             WebSocketServer listener = new WebSocketServer();
@@ -47,9 +58,16 @@ namespace SteamLogin
             listener.Start();
         }
 
+        // Sends uPnP packet to smart plugs to physically turn off displays so no annoying noise is made
+        private void handleMonitorCount()
+        {
+            // do nothing (yet)
+        }
+
         // event handler to receive login attempts
         private void Listener_NewMessageReceived(WebSocketSession session, string value)
         {
+            MonitorCount = Screen.AllScreens.Length;
             PerformLogin(value);
         }
 
@@ -91,6 +109,7 @@ namespace SteamLogin
         }
 
         // All the below just simply closes the application
+        #region EXIT_APPLICATION
         private void QuitApplication()
         {
             Application.Exit();
@@ -104,6 +123,19 @@ namespace SteamLogin
         private void ExitToolStripMenuItem_Click(object sender, EventArgs e)
         {
             QuitApplication();
+        }
+        #endregion
+
+        private void notifyIcon1_DoubleClick(object sender, EventArgs e)
+        {
+            Process.Start("http://adamdev/steam/");
+        }
+
+        // open screen manager
+        private void screensToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            ScreenManager screenManager = new ScreenManager();
+            screenManager.Show();
         }
     }
 }
